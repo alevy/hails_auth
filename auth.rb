@@ -32,6 +32,13 @@ helpers do
                         :path => "/")
   end
   
+  def do_logout
+    session[:username] = nil
+    response.set_cookie("_hails_user", :value => nil,
+                        :domain => ".gitstar.com",
+                        :path => "/")
+  end
+  
 end
 
 get "/" do
@@ -48,7 +55,7 @@ post "/signup" do
   if not user
     user = {"_id" => params[:username], "password" => BCrypt::Password.create(params[:password])}
     @@coll.save(user)
-    session[:username] = params[:username]
+    do_login(params[:username])
     
     redirect "/"
   else
@@ -59,14 +66,14 @@ end
 post "/login" do
   user = @@coll.find_one("_id" => params[:username])
   if user and BCrypt::Password.new(user["password"]) == params[:password]
-    session[:username] = params[:username]
+    do_login(params[:username])
     redirect "/"
   end
   haml :error
 end
 
 get "/logout" do
-  session[:username] = nil
+  do_logout
   redirect "/"
 end
 
