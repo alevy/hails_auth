@@ -63,7 +63,7 @@ post "/signup" do
     @@coll.save(user)
     do_login(params[:username])
     
-    redirect "/"
+    redirect (session[:redirect_to] || "/")
   else
     redirect back
   end
@@ -73,14 +73,14 @@ post "/login" do
   user = @@coll.find_one("_id" => params[:username])
   if user and BCrypt::Password.new(user["password"]) == params[:password]
     do_login(params[:username])
-    redirect "/"
+    redirect (session[:redirect_to] || "/")
   end
   haml :error
 end
 
 get "/logout" do
   do_logout
-  redirect "/"
+  redirect back
 end
 
 __END__
