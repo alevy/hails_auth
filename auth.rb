@@ -27,7 +27,10 @@ helpers do
   def do_login(username)
     session[:username] = username
     mac = Digest::HMAC.new(ENV["HMAC_KEY"], Digest::SHA1).hexdigest(username)
-    response.set_cookie("_hails_user", :value => [username, mac].join(":"),
+    response.set_cookie("_hails_user", :value => username,
+                        :domain => ".gitstar.com",
+                        :path => "/")
+    response.set_cookie("_hails_user_hmac", :value => mac,
                         :domain => ".gitstar.com",
                         :path => "/")
   end
@@ -35,6 +38,9 @@ helpers do
   def do_logout
     session[:username] = nil
     response.set_cookie("_hails_user", :value => nil,
+                        :domain => ".gitstar.com",
+                        :path => "/")
+    response.set_cookie("_hails_user_hmac", :value => nil,
                         :domain => ".gitstar.com",
                         :path => "/")
   end
